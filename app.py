@@ -57,6 +57,44 @@ if response.status_code == 200:
 
     print("\nAfter cleaning:\n")
     print(df.head())
+    print("\nAfter cleaning:\n")
+    print(df.head())
+
+    # ================= ML STARTS HERE =================
+
+    # Features (inputs)
+    X = df[['hour', 'day', 'month']]
+
+    # Target (output)
+    y = df['flare_level']
+
+    print("\nFeatures (X):\n", X.head())
+    print("\nTarget (y):\n", y.head())
+
+    # Train-test split
+    from sklearn.model_selection import train_test_split
+
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y, test_size=0.2, random_state=42
+    )
+
+    # Train model
+    from sklearn.ensemble import RandomForestClassifier
+
+    model = RandomForestClassifier()
+    model.fit(X_train, y_train)
+
+    print("\n✅ Model trained successfully!")
+
+    # Evaluate
+    accuracy = model.score(X_test, y_test)
+    print("\nModel Accuracy:", accuracy)
+
+    # Prediction
+    sample = [[12, 10, 1]]
+
+    prediction = model.predict(sample)
+    print("\nPrediction for sample input:", prediction)
 
 else:
     print("❌ Failed to fetch data")
