@@ -2,6 +2,7 @@ import requests
 import pandas as pd
 import os
 from dotenv import load_dotenv
+from datetime import datetime, timedelta
 
 # Load .env file
 load_dotenv(dotenv_path=".env")
@@ -13,7 +14,10 @@ API_KEY = os.getenv("API_KEY")
 print("API KEY:", API_KEY)
 
 # API URL
-url = f"https://api.nasa.gov/DONKI/FLR?startDate=2023-01-01&api_key={API_KEY}"
+today = datetime.today()
+past = today - timedelta(days=30)
+
+url = f"https://api.nasa.gov/DONKI/FLR?startDate={past.date()}&endDate={today.date()}&api_key={API_KEY}"
 
 response = requests.get(url)
 
@@ -91,8 +95,7 @@ if response.status_code == 200:
     print("\nModel Accuracy:", accuracy)
 
     # Prediction
-    sample = [[12, 10, 1]]
-
+    sample = pd.DataFrame([[12, 10, 1]], columns=['hour', 'day', 'month'])
     prediction = model.predict(sample)
     print("\nPrediction for sample input:", prediction)
 
