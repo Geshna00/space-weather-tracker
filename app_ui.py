@@ -16,10 +16,33 @@ past = today - timedelta(days=30)
 
 url = f"https://api.nasa.gov/DONKI/FLR?startDate={past.date()}&endDate={today.date()}&api_key={API_KEY}"
 
-response = requests.get(url)
-data = response.json()
+try:
+    response = requests.get(url, timeout=10)
 
-df = pd.DataFrame(data)
+    if response.status_code == 200 and response.text.strip() != "":
+        data = response.json()
+        df = pd.DataFrame(data)
+    else:
+        st.warning("⚠️ API not responding. Using fallback data.")
+        df = pd.DataFrame({
+            'classType': ['C1.0', 'M1.2', 'X1.0'],
+            'peakTime': [
+                '2026-01-01T10:00Z',
+                '2026-01-02T12:00Z',
+                '2026-01-03T15:00Z'
+            ]
+        })
+
+except Exception as e:
+    st.error("🚨 API Error. Using fallback data.")
+    df = pd.DataFrame({
+        'classType': ['C1.0', 'M1.2', 'X1.0'],
+        'peakTime': [
+            '2026-01-01T10:00Z',
+            '2026-01-02T12:00Z',
+            '2026-01-03T15:00Z'
+        ]
+    })
 
 # Preprocess
 df = df[['classType', 'peakTime']]
