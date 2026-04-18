@@ -54,11 +54,14 @@ model.fit(X, y)
 st.title("🌌 Space Weather Tracker")
 st.write("Predict Solar Flare Intensity")
 
-hour = st.slider("Hour", 0, 23)
-day = st.slider("Day", 1, 31)
-month = st.slider("Month", 1, 12)
+with st.form("prediction_form"):
+    hour = st.slider("🕐 Hour", 0, 23)
+    day = st.slider("📅 Day", 1, 31)
+    month = st.slider("📆 Month", 1, 12)
 
-if st.button("Predict"):
+    submit = st.form_submit_button("🚀 Predict")
+
+if submit:
     sample = pd.DataFrame([[hour, day, month]], columns=['hour','day','month'])
     prediction = model.predict(sample)
 
