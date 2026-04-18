@@ -83,20 +83,24 @@ model = load_model(API_KEY)
 st.title("🌌 Space Weather Tracker")
 st.write("Predict Solar Flare Intensity")
 
-with st.form("prediction_form"):
-    hour = st.slider("🕐 Hour", 0, 23)
-    day = st.slider("📅 Day", 1, 31)
-    month = st.slider("📆 Month", 1, 12)
+# Chatbot UI
+user_input = st.text_input("💬 Ask about space weather:")
 
-    submit = st.form_submit_button("🚀 Predict")
+submit = st.button("🚀 Ask")
 
-if submit:
-    sample = pd.DataFrame([[hour, day, month]], columns=['hour','day','month'])
-    prediction = model.predict(sample)
+if submit and user_input:
+    # Use current time as input for prediction
+    now = datetime.now()
+    sample = pd.DataFrame([[now.hour, now.day, now.month]],
+                          columns=['hour','day','month'])
 
-    if prediction[0] == 3:
-        st.error("🚨 High Solar Activity (X-class)")
-    elif prediction[0] == 2:
-        st.warning("⚠️ Moderate Activity (M-class)")
+    prediction = model.predict(sample)[0]
+
+    if prediction == 3:
+        level = "High (X-class)"
+    elif prediction == 2:
+        level = "Moderate (M-class)"
     else:
-        st.success("✅ Low Activity (C-class)")
+        level = "Low (C-class)"
+
+    st.write(f"🌞 Predicted Solar Activity: {level}")
