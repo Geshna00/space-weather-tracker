@@ -5,10 +5,16 @@ import os
 from dotenv import load_dotenv
 from datetime import datetime, timedelta
 from sklearn.ensemble import RandomForestClassifier
+import google.generativeai as genai
 
-# Load API key
+# Load .env FIRST
 load_dotenv(dotenv_path=".env")
+
 API_KEY = os.getenv("API_KEY")
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+
+genai.configure(api_key=GEMINI_API_KEY)
+model_ai = genai.GenerativeModel("gemini-pro")
 
 @st.cache_resource
 def load_model(API_KEY):
@@ -103,4 +109,24 @@ if submit and user_input:
     else:
         level = "Low (C-class)"
 
+    # 🧠 Prompt for AI
+    prompt = f"""
+    You are a space weather expert.
+
+    The predicted solar activity level is: {level}.
+
+    User question: {user_input}
+
+    Explain the situation in simple terms.
+    Mention possible effects on satellites, GPS, and communication.
+    Keep it short and clear.
+    """
+
+    try:
+        response = model_ai.generate_content(prompt)
+        ai_reply = response.text
+    except:
+        ai_reply = "⚠️ AI response failed."
+
     st.write(f"🌞 Predicted Solar Activity: {level}")
+    st.write(f"🤖 AI Explanation: {ai_reply}")
