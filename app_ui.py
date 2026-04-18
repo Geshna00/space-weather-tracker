@@ -5,16 +5,15 @@ import os
 from dotenv import load_dotenv
 from datetime import datetime, timedelta
 from sklearn.ensemble import RandomForestClassifier
-import google.generativeai as genai
+from google import genai
 
 # Load .env FIRST
 load_dotenv(dotenv_path=".env")
 
-API_KEY = os.getenv("API_KEY")
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+API_KEY = os.getenv("API_KEY")
 
-genai.configure(api_key=GEMINI_API_KEY)
-model_ai = genai.GenerativeModel("gemini-pro")
+client = genai.Client(api_key=GEMINI_API_KEY)
 
 @st.cache_resource
 def load_model(API_KEY):
@@ -123,10 +122,23 @@ if submit and user_input:
     """
 
     try:
-        response = model_ai.generate_content(prompt)
-        ai_reply = response.text
-    except:
-        ai_reply = "⚠️ AI response failed."
+        response = client.models.generate_content(
+            model="gemini-2.0-flash",
+            contents=prompt
+        )
 
+        ai_reply = response.text
+
+    except Exception as e:
+        if "429" in str(e):
+            ai_reply = f"""
+            Gemini quota reached right now.
+
+            Based on current prediction ({level}), solar activity may cause mild disturbances in communication systems, GPS accuracy, or satellites depending on intensity.
+
+            A solar flare is a sudden burst of radiation from the Sun caused by magnetic energy release.
+            """
+        else:
+            ai_reply = f"⚠️ AI error: {str(e)}"
     st.write(f"🌞 Predicted Solar Activity: {level}")
     st.write(f"🤖 AI Explanation: {ai_reply}")
