@@ -211,7 +211,11 @@ Max tokens:  {MAX_TOKENS}""")
 # ─────────────────────────────────────────────
 # System prompt — domain-constrained role
 # ─────────────────────────────────────────────
+today_str = now.strftime("%A, %d %B %Y")  # e.g. "Wednesday, 30 April 2026"
+
 SYSTEM_PROMPT = f"""You are SolarBot, a solar physics and space weather expert assistant.
+
+Today's date is {today_str}. Always use this when the user asks about today, yesterday, or any relative time. Do NOT use your training data for the current date.
 
 Current ML prediction (from NASA DONKI solar flare data): activity level is {level_word} — {level_label}.
 
